@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Book Direct · Plymouth Contractor Stay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#1a1f2e; --ink-mid:#3d4457; --mist:#8b93a8; --rule:#dde1ea;
+    --paper:#f7f8fb; --white:#fff; --dock:#1d3557; --dock-dark:#111f34;
+    --signal:#e8a838; --signal-lt:#fef3d7; --ok:#1f7a4d; --ok-lt:#e3f4eb;
+    --radius:8px;
+    --f-display:'DM Serif Display',Georgia,serif;
+    --f-body:'Inter',system-ui,sans-serif;
+    --f-mono:'DM Mono',monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--f-body);background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+
+  nav{position:sticky;top:0;z-index:50;background:var(--dock);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;border-bottom:3px solid var(--signal)}
+  .nav-brand{font-family:var(--f-mono);font-size:.8rem;color:var(--signal);letter-spacing:.12em;text-transform:uppercase}
+  .nav-back{color:rgba(255,255,255,.7);text-decoration:none;font-size:.82rem}
+  .nav-back:hover{color:var(--signal)}
+
+  .wrap{max-width:1080px;margin:0 auto;padding:3rem 1.5rem 5rem}
+
+  .head{margin-bottom:2.5rem}
+  .eyebrow{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--signal);margin-bottom:.6rem;display:flex;align-items:center;gap:.6rem}
+  .eyebrow::before{content:'';width:28px;height:2px;background:var(--signal)}
+  h1{font-family:var(--f-display);font-size:clamp(2rem,4vw,2.8rem);line-height:1.1;margin-bottom:.6rem}
+  .head p{color:var(--ink-mid);max-width:560px}
+
+  /* Stepper */
+  .steps{display:flex;gap:0;margin-bottom:2.5rem;border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden;background:var(--white)}
+  .step{flex:1;padding:1rem .75rem;text-align:center;font-size:.78rem;font-weight:600;color:var(--mist);border-right:1px solid var(--rule);position:relative;transition:all .3s}
+  .step:last-child{border-right:none}
+  .step.active{background:var(--dock);color:var(--white)}
+  .step.done{background:var(--ok-lt);color:var(--ok)}
+  .step-num{display:inline-flex;width:22px;height:22px;border-radius:50%;background:var(--rule);color:var(--ink-mid);align-items:center;justify-content:center;font-family:var(--f-mono);font-size:.7rem;margin-right:.4rem}
+  .step.active .step-num{background:var(--signal);color:var(--dock-dark)}
+  .step.done .step-num{background:var(--ok);color:#fff}
+
+  .grid{display:grid;grid-template-columns:1fr 360px;gap:2rem;align-items:start}
+
+  .panel{background:var(--white);border:1px solid var(--rule);border-radius:12px;padding:2rem;box-shadow:0 4px 24px rgba(29,53,87,.05)}
+  .panel h2{font-family:var(--f-display);font-size:1.4rem;margin-bottom:.4rem}
+  .panel .sub{color:var(--ink-mid);font-size:.9rem;margin-bottom:1.5rem}
+
+  .stage{display:none}
+  .stage.active{display:block;animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .field{margin-bottom:1.1rem}
+  .field label{display:block;font-family:var(--f-mono);font-size:.7rem;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-mid);margin-bottom:.4rem}
+  .field input,.field select,.field textarea{width:100%;padding:.7rem .9rem;border:1.5px solid var(--rule);border-radius:var(--radius);font-family:var(--f-body);font-size:.9rem;background:var(--paper);outline:none;transition:border-color .2s}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--dock);background:var(--white)}
+  .field textarea{resize:vertical;min-height:80px}
+  .cal-link{display:inline-block;margin:-0.4rem 0 1rem;font-size:.83rem;color:var(--dock);text-decoration:none;font-weight:500;border-bottom:1px solid transparent;transition:border-color .2s}
+  .cal-link:hover{border-color:var(--dock)}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+
+  .check{display:flex;gap:.7rem;align-items:flex-start;padding:.9rem;background:var(--paper);border:1px solid var(--rule);border-radius:var(--radius);margin-bottom:.8rem;cursor:pointer;transition:border-color .2s}
+  .check:hover{border-color:var(--dock)}
+  .check input{margin-top:.2rem;width:18px;height:18px;flex-shrink:0;accent-color:var(--dock)}
+  .check span{font-size:.85rem;color:var(--ink-mid);line-height:1.5}
+  .check strong{color:var(--ink)}
+
+  .btn{width:100%;padding:.95rem;border:none;border-radius:var(--radius);font-family:var(--f-body);font-weight:700;font-size:.95rem;cursor:pointer;transition:all .2s;margin-top:.5rem}
+  .btn-primary{background:var(--dock);color:#fff}
+  .btn-primary:hover{background:var(--signal);color:var(--dock-dark);transform:translateY(-1px)}
+  .btn-primary:disabled{background:var(--rule);color:var(--mist);cursor:not-allowed;transform:none}
+  .btn-ghost{background:transparent;color:var(--ink-mid);border:1.5px solid var(--rule);margin-top:.6rem}
+  .btn-ghost:hover{border-color:var(--dock);color:var(--dock)}
+
+  /* Summary card */
+  .summary{background:var(--white);border:1px solid var(--rule);border-radius:12px;overflow:hidden;position:sticky;top:80px;box-shadow:0 4px 24px rgba(29,53,87,.05)}
+  .summary-img{width:100%;height:140px;object-fit:cover;display:block}
+  .summary-body{padding:1.5rem}
+  .summary-body h3{font-family:var(--f-display);font-size:1.15rem;margin-bottom:.2rem}
+  .summary-loc{font-size:.8rem;color:var(--mist);margin-bottom:1rem}
+  .sum-row{display:flex;justify-content:space-between;font-size:.88rem;padding:.5rem 0;border-bottom:1px solid var(--rule);color:var(--ink-mid)}
+  .sum-row:last-of-type{border-bottom:none}
+  .sum-row .v{font-weight:600;color:var(--ink)}
+  .sum-total{display:flex;justify-content:space-between;align-items:baseline;margin-top:1rem;padding-top:1rem;border-top:2px solid var(--ink)}
+  .sum-total .l{font-weight:600}
+  .sum-total .v{font-family:var(--f-display);font-size:1.6rem;color:var(--dock)}
+  .sum-note{font-size:.72rem;color:var(--mist);margin-top:.5rem;line-height:1.4}
+
+  .pill{display:inline-flex;align-items:center;gap:.35rem;font-family:var(--f-mono);font-size:.66rem;letter-spacing:.04em;padding:.25rem .6rem;border-radius:99px;background:var(--ok-lt);color:var(--ok);margin-bottom:1rem}
+
+  /* legal callout */
+  .legal{background:var(--signal-lt);border-left:3px solid var(--signal);border-radius:6px;padding:1rem 1.1rem;font-size:.82rem;color:#7a5300;line-height:1.55;margin-bottom:1.5rem}
+  .legal strong{color:#5c3e00}
+
+  /* Card field group (Stripe placeholder) */
+  .card-box{border:1.5px solid var(--rule);border-radius:var(--radius);padding:1rem;background:var(--paper)}
+  .card-box .field:last-child{margin-bottom:0}
+  .secured{display:flex;align-items:center;gap:.4rem;justify-content:center;font-size:.75rem;color:var(--mist);margin-top:1rem}
+
+  /* success */
+  .done-card{text-align:center;padding:1rem}
+  .done-icon{width:64px;height:64px;background:var(--ok-lt);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 1.25rem;font-size:2rem}
+  .done-card h2{font-family:var(--f-display);font-size:1.7rem;margin-bottom:.5rem}
+  .done-card p{color:var(--ink-mid);font-size:.92rem;max-width:380px;margin:0 auto .4rem}
+  .ref{font-family:var(--f-mono);background:var(--paper);border:1px dashed var(--rule);border-radius:6px;padding:.6rem 1rem;display:inline-block;margin-top:1rem;font-size:.85rem;letter-spacing:.05em}
+
+  .review-box{border:1px solid var(--rule);border-radius:var(--radius);overflow:hidden}
+  .review-box .rr{display:flex;justify-content:space-between;padding:.7rem 1rem;font-size:.87rem;border-bottom:1px solid var(--rule)}
+  .review-box .rr:last-child{border-bottom:none}
+  .review-box .rr span:first-child{color:var(--mist)}
+  .review-box .rr span:last-child{font-weight:600;text-align:right;max-width:60%}
+  .dev-banner{background:#111f34;color:#cdd5e3;font-family:var(--f-mono);font-size:.72rem;padding:.65rem 1.5rem;text-align:center;line-height:1.5}
+  .dev-banner b{color:var(--signal)}
+
+  @media(max-width:860px){
+    .grid{grid-template-columns:1fr}
+    .summary{position:static;order:-1}
+    .steps{font-size:.66rem}
+    .step-num{display:none}
+    nav{padding:0 1rem}
+  }
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+
+<div class="dev-banner">
+  <b>REQUEST TO BOOK</b> &nbsp;·&nbsp; Send your dates and details — we confirm availability &amp; pricing, usually within the hour.
+</div>
+
+<nav>
+  <div class="nav-brand">Plymouth Contractor Stay · Book Direct</div>
+  <a class="nav-back" href="index.html">← Back to property</a>
+</nav>
+
+<div class="wrap">
+  <div class="head">
+    <p class="eyebrow">Direct Booking — no platform fees</p>
+    <h1>Request your serviced stay</h1>
+    <p>Book the property directly — no Airbnb service fee. Share your dates, confirm a few quick checks, review the licence terms, and send your request. we confirm availability and exact pricing, usually within the hour.</p>
+  </div>
+
+  <!-- STEPPER -->
+  <div class="steps" id="stepper">
+    <div class="step active" data-step="1"><span class="step-num">1</span>Your details</div>
+    <div class="step" data-step="2"><span class="step-num">2</span>Quick checks</div>
+    <div class="step" data-step="3"><span class="step-num">3</span>Agreement</div>
+    <div class="step" data-step="4"><span class="step-num">4</span>Send request</div>
+  </div>
+
+  <div class="grid">
+    <!-- LEFT: stages -->
+    <div class="panel">
+
+      <!-- STAGE 1 -->
+      <div class="stage active" id="stage1">
+        <h2>Who's staying & when</h2>
+        <p class="sub">Tell us the basics so we can confirm availability and pricing.</p>
+        <div class="field">
+          <label>Full name</label>
+          <input type="text" id="g-name" placeholder="e.g. James Hartley" />
+        </div>
+        <div class="row2">
+          <div class="field"><label>Email</label><input type="email" id="g-email" placeholder="you@email.com" /></div>
+          <div class="field"><label>Phone</label><input type="tel" id="g-phone" placeholder="+44 7700 000000" /></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>Check-in</label><input type="date" id="g-in" /></div>
+          <div class="field"><label>Check-out</label><input type="date" id="g-out" /></div>
+        </div>
+        <a href="availability.html" class="cal-link">📅 Not sure on dates? Check the availability calendar →</a>
+        <div class="row2">
+          <div class="field">
+            <label>Booking on behalf of</label>
+            <select id="g-onbehalf">
+              <option value="self">Myself (individual contractor)</option>
+              <option value="company">My company / employer</option>
+            </select>
+          </div>
+          <div class="field"><label>Guests</label>
+            <select id="g-guests"><option>1</option><option>2</option><option>3</option><option>4</option></select>
+          </div>
+        </div>
+        <div class="field" id="company-field" style="display:none">
+          <label>Company name</label>
+          <input type="text" id="g-company" placeholder="Registered company name" />
+        </div>
+        <div class="field">
+          <label>What's the project?</label>
+          <textarea id="g-project" placeholder="e.g. 10-week site role at Devonport Dockyard"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="go(2)">Continue to checks →</button>
+      </div>
+
+      <!-- STAGE 2 -->
+      <div class="stage" id="stage2">
+        <h2>A few quick checks</h2>
+        <p class="sub">These confirm the stay is a genuine serviced-accommodation booking and protect both sides.</p>
+        <div class="legal">
+          <strong>Why we ask:</strong> This property is let as serviced accommodation on a licence, not a tenancy. Confirming the points below keeps the arrangement clear and lawful for everyone.
+        </div>
+        <label class="check"><input type="checkbox" class="vet" />
+          <span><strong>My main home is elsewhere.</strong> I'm staying here temporarily for work and my permanent residence is at another address.</span></label>
+        <label class="check"><input type="checkbox" class="vet" />
+          <span><strong>I'll provide ID.</strong> I agree to upload a photo ID before check-in for verification (handled securely after booking).</span></label>
+        <label class="check"><input type="checkbox" class="vet" />
+          <span><strong>I understand the services.</strong> The owner provides cleaning, linen, utilities and Wi-Fi, and retains access to the property during my stay.</span></label>
+        <label class="check"><input type="checkbox" class="vet" />
+          <span><strong>House rules.</strong> No smoking inside, no parties, max 4 guests, and I'll treat the property with care.</span></label>
+        <button class="btn btn-primary" id="vet-btn" onclick="go(3)" disabled>Continue to agreement →</button>
+        <button class="btn btn-ghost" onclick="go(1)">← Back</button>
+      </div>
+
+      <!-- STAGE 3 -->
+      <div class="stage" id="stage3">
+        <h2>Occupation licence</h2>
+        <p class="sub">Please read and accept the serviced accommodation licence for your stay.</p>
+        <div style="max-height:240px;overflow-y:auto;border:1px solid var(--rule);border-radius:var(--radius);padding:1.1rem;font-size:.83rem;color:var(--ink-mid);line-height:1.6;background:var(--paper);margin-bottom:1.2rem">
+          <p style="font-weight:700;color:var(--ink);margin-bottom:.5rem">Serviced Accommodation Occupation Licence — Summary</p>
+          <p style="margin-bottom:.6rem">This is a <strong>licence to occupy serviced accommodation</strong> for the dates booked. It does not create a tenancy or assured shorthold tenancy, and does not grant exclusive possession.</p>
+          <p style="margin-bottom:.6rem">The owner provides cleaning, linen, utilities, Wi-Fi and maintenance, and retains the right to access the property for these services and management.</p>
+          <p style="margin-bottom:.6rem">The monthly rent is paid in advance and is all-inclusive — utilities, Wi-Fi, cleaning and linen are covered, with no separate cleaning fee or deposit.</p>
+          <p style="margin-bottom:.6rem">The licence ends on the booked end date. You confirm your main home is elsewhere and that you occupy the property only temporarily for work.</p>
+          <p style="font-size:.76rem;color:var(--mist);margin-top:.8rem">Full terms are in the written agreement provided with your booking confirmation.</p>
+        </div>
+        <label class="check"><input type="checkbox" id="agree-box" onchange="document.getElementById('agree-btn').disabled=!this.checked" />
+          <span>I have read and accept the <strong>serviced accommodation occupation licence</strong> for my stay.</span></label>
+        <button class="btn btn-primary" id="agree-btn" onclick="go(4)" disabled>Accept & continue to payment →</button>
+        <button class="btn btn-ghost" onclick="go(2)">← Back</button>
+      </div>
+
+      <!-- STAGE 4 -->
+      <div class="stage" id="stage4">
+        <h2>Review &amp; send your request</h2>
+        <p class="sub">Check your details below and send. No payment is taken now — we'll confirm availability and pricing, then send you a secure way to pay.</p>
+        <div class="review-box" id="review-box"></div>
+        <div class="legal" style="margin-top:1.2rem">
+          Sending this request doesn't create a confirmed booking or take payment. Your stay is confirmed once we reply and you complete payment. The occupation licence you accepted applies to the confirmed stay.
+        </div>
+        <button class="btn btn-primary" id="send-btn" onclick="sendRequest()">Send booking request →</button>
+        <button class="btn btn-ghost" onclick="go(3)">← Back</button>
+      </div>
+
+      <!-- STAGE 5: success -->
+      <div class="stage" id="stage5">
+        <div class="done-card">
+          <div class="done-icon">✅</div>
+          <h2>Request sent</h2>
+          <p>Thanks <span id="done-name">there</span> — your booking request is in. We typically reply within the hour with availability confirmed and exact pricing for your dates.</p>
+          <p>Keep an eye on your inbox (and your spam folder, just in case). Your request reference is below.</p>
+          <div class="ref">REF: <span id="done-ref">PCS-000000</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- RIGHT: summary -->
+    <div class="summary">
+      <img class="summary-img" src="images/living.JPG" alt="Property" />
+      <div class="summary-body">
+        <span class="pill">● Direct rate · no platform fee</span>
+        <h3>Plymouth Monthly Stay</h3>
+        <p class="summary-loc">Central Plymouth, Devon · Entire home · Sleeps 4</p>
+
+        <div class="sum-row"><span>Check-in</span><span class="v" id="s-in">—</span></div>
+        <div class="sum-row"><span>Check-out</span><span class="v" id="s-out">—</span></div>
+        <div class="sum-row"><span>Length of stay</span><span class="v" id="s-nights">—</span></div>
+        <div class="sum-row"><span>Rate</span><span class="v">£65 / night</span></div>
+
+        <div class="sum-total"><span class="l">Estimated total</span><span class="v" id="s-total">—</span></div>
+        <p class="sum-note">All-inclusive — no cleaning fee, no deposit. Final price is confirmed when we reply to your request.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ====== EDIT THIS TO YOUR PRICING ======
+  const DAILY_RATE = 65;    // £ per night — estimate shown to guest
+  // ========================================
+
+  let currentStep = 1;
+
+  // on-behalf toggle
+  document.getElementById('g-onbehalf').addEventListener('change', function(){
+    document.getElementById('company-field').style.display = this.value==='company' ? 'block':'none';
+  });
+
+  // vetting checkboxes enable button
+  const vets = document.querySelectorAll('.vet');
+  vets.forEach(c=>c.addEventListener('change', ()=>{
+    document.getElementById('vet-btn').disabled = ![...vets].every(v=>v.checked);
+  }));
+
+  // date min
+  const today=new Date().toISOString().split('T')[0];
+  document.getElementById('g-in').min=today;
+  document.getElementById('g-out').min=today;
+  document.getElementById('g-in').addEventListener('change',function(){document.getElementById('g-out').min=this.value;recalc()});
+  document.getElementById('g-out').addEventListener('change',recalc);
+  document.getElementById('g-onbehalf').addEventListener('change',recalc);
+
+  function fmtDate(d){ if(!d)return'—'; const x=new Date(d); return x.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}); }
+  function gbp(n){ return '£'+n.toLocaleString('en-GB'); }
+
+  function fmtLength(nights){
+    const months=Math.floor(nights/30.44);
+    const remDays=Math.round(nights-months*30.44);
+    if(nights>=30 && remDays<=2 && months>=1) return months+' month'+(months>1?'s':'');
+    if(months>=1) return months+' month'+(months>1?'s':'')+(remDays>0?', '+remDays+' day'+(remDays>1?'s':''):'');
+    return nights+' night'+(nights!==1?'s':'');
+  }
+
+  function recalc(){
+    const inV=document.getElementById('g-in').value, outV=document.getElementById('g-out').value;
+    document.getElementById('s-in').textContent=fmtDate(inV);
+    document.getElementById('s-out').textContent=fmtDate(outV);
+    let nights=0;
+    if(inV&&outV){ nights=Math.max(0,Math.round((new Date(outV)-new Date(inV))/86400000)); }
+    document.getElementById('s-nights').textContent = nights? fmtLength(nights) : '—';
+    // Estimate: nights × daily rate.
+    const total = nights>0 ? nights*DAILY_RATE : 0;
+    document.getElementById('s-total').textContent = nights? gbp(total) : '—';
+  }
+
+  function go(step){
+    // basic validation gate for step 1
+    if(step===2){
+      const n=document.getElementById('g-name').value.trim();
+      const e=document.getElementById('g-email').value.trim();
+      const i=document.getElementById('g-in').value, o=document.getElementById('g-out').value;
+      if(!n||!e||!i||!o){ alert('Please fill in your name, email, and both dates.'); return; }
+      if(new Date(o)<=new Date(i)){ alert('Check-out must be after check-in.'); return; }
+    }
+    if(step===4){ renderReview(); }
+    currentStep=step;
+    document.querySelectorAll('.stage').forEach(s=>s.classList.remove('active'));
+    document.getElementById('stage'+step).classList.add('active');
+    // stepper visual (max 4 shown)
+    document.querySelectorAll('.step').forEach(el=>{
+      const sNum=+el.dataset.step;
+      el.classList.remove('active','done');
+      if(sNum<Math.min(step,4)) el.classList.add('done');
+      else if(sNum===Math.min(step,4)) el.classList.add('active');
+    });
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  const val=id=>document.getElementById(id).value.trim();
+
+  function renderReview(){
+    const onbehalf=document.getElementById('g-onbehalf').value;
+    const rows=[
+      ['Name', val('g-name')],
+      ['Email', val('g-email')],
+      ['Phone', val('g-phone')||'—'],
+      ['Check-in', fmtDate(val('g-in'))],
+      ['Check-out', fmtDate(val('g-out'))],
+      ['Guests', val('g-guests')],
+      ['Booking as', onbehalf==='company' ? ('Company: '+(val('g-company')||'(name not given)')) : 'Individual contractor'],
+      ['Project', val('g-project')||'—']
+    ];
+    document.getElementById('review-box').innerHTML =
+      rows.map(r=>`<div class="rr"><span>${r[0]}</span><span>${r[1].replace(/</g,'&lt;')}</span></div>`).join('');
+  }
+
+  // ── ENQUIRY SUBMISSION ──
+  // Web3Forms endpoint — booking requests are emailed to you.
+  const FORM_ENDPOINT = 'https://api.web3forms.com/submit';
+
+  async function sendRequest(){
+    const btn=document.getElementById('send-btn');
+    btn.disabled=true; btn.textContent='Sending…';
+
+    const payload={
+      access_key:'0d8cd66d-f57b-49a2-83f5-f56aa9709e6b',
+      subject:'New booking request — Plymouth Contractor Stay',
+      from_name:'Plymouth Contractor Stay website',
+      name:val('g-name'), email:val('g-email'), phone:val('g-phone'),
+      checkin:val('g-in'), checkout:val('g-out'), guests:val('g-guests'),
+      booking_type:document.getElementById('g-onbehalf').value,
+      company:val('g-company'), project:val('g-project'),
+      licence_accepted:'yes', main_home_elsewhere:'confirmed',
+      source:'Direct website booking request'
+    };
+
+    const finish=()=>{
+      document.getElementById('done-name').textContent=(val('g-name').split(' ')[0])||'there';
+      document.getElementById('done-ref').textContent='PCS-'+Math.floor(100000+Math.random()*900000);
+      go(5);
+    };
+
+    if(!FORM_ENDPOINT){ setTimeout(finish,900); return; } // demo mode
+
+    try{
+      const res=await fetch(FORM_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},body:JSON.stringify(payload)});
+      if(res.ok){ finish(); }
+      else{ throw new Error('Request failed'); }
+    }catch(e){
+      alert('Sorry — something went wrong sending your request. Please email us directly or try again.');
+      btn.disabled=false; btn.textContent='Send booking request →';
+    }
+  }
+
+  // Prefill from URL params (when arriving from the landing-page form)
+  (function prefill(){
+    const q=new URLSearchParams(location.search);
+    if(![...q].length) return;
+    const map={name:'g-name',email:'g-email',phone:'g-phone',checkin:'g-in',checkout:'g-out',project:'g-project'};
+    for(const k in map){ if(q.get(k)) document.getElementById(map[k]).value=q.get(k); }
+    if(q.get('guests')){ const g=document.getElementById('g-guests'); const v=q.get('guests'); if([...g.options].some(o=>o.value===v||o.text===v)) g.value=v; }
+  })();
+
+  recalc();
+</script>
+<script>
+  (function(){
+    const ph = (label)=> 'data:image/svg+xml;utf8,' + encodeURIComponent(
+      '<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600"><rect width="800" height="600" fill="#1d3557"/><text x="50%" y="50%" fill="#e8a838" font-family="monospace" font-size="26" text-anchor="middle">📷 ' + label + '</text></svg>');
+    document.querySelectorAll('img[src^="images/"]').forEach(img=>{
+      img.addEventListener('error', function(){
+        const name=(img.getAttribute('src').split('/').pop()||'photo').replace(/\.[a-zA-Z]+$/,'');
+        img.onerror=null; img.src=ph(name);
+      });
+    });
+  })();
+</script>
+</body>
+</html>

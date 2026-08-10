@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Availability · Plymouth Contractor Stay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --ink:#1a1f2e;--ink-mid:#3d4457;--mist:#8b93a8;--rule:#dde1ea;
+    --paper:#f7f8fb;--white:#fff;--dock:#1d3557;--dock-dark:#111f34;
+    --signal:#e8a838;--signal-lt:#fef3d7;--ok:#1f7a4d;--ok-lt:#e3f4eb;
+    --busy:#f2d0d0;--busy-ink:#a23b3b;--radius:8px;
+    --f-display:'DM Serif Display',Georgia,serif;--f-body:'Inter',system-ui,sans-serif;--f-mono:'DM Mono',monospace;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--f-body);background:var(--paper);color:var(--ink);line-height:1.6;-webkit-font-smoothing:antialiased}
+  nav{position:sticky;top:0;z-index:50;background:var(--dock);height:56px;display:flex;align-items:center;justify-content:space-between;padding:0 2rem;border-bottom:3px solid var(--signal)}
+  .nav-brand{font-family:var(--f-mono);font-size:.8rem;color:var(--signal);letter-spacing:.12em;text-transform:uppercase}
+  .nav-back{color:rgba(255,255,255,.7);text-decoration:none;font-size:.82rem}
+  .nav-back:hover{color:var(--signal)}
+  .wrap{max-width:920px;margin:0 auto;padding:3rem 1.5rem 5rem}
+  .head{margin-bottom:2rem}
+  .eyebrow{font-family:var(--f-mono);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase;color:var(--signal);margin-bottom:.6rem;display:flex;align-items:center;gap:.6rem}
+  .eyebrow::before{content:'';width:28px;height:2px;background:var(--signal)}
+  h1{font-family:var(--f-display);font-size:clamp(2rem,4vw,2.8rem);line-height:1.1;margin-bottom:.6rem}
+  .head p{color:var(--ink-mid);max-width:600px}
+
+  .cal-card{background:var(--white);border:1px solid var(--rule);border-radius:14px;padding:1.75rem;box-shadow:0 4px 24px rgba(29,53,87,.05)}
+
+  .cal-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
+  .cal-nav{display:flex;gap:.5rem}
+  .cal-btn{width:38px;height:38px;border:1.5px solid var(--rule);background:var(--white);border-radius:var(--radius);cursor:pointer;font-size:1.1rem;color:var(--dock);display:flex;align-items:center;justify-content:center;transition:all .15s}
+  .cal-btn:hover:not(:disabled){border-color:var(--dock);background:var(--paper)}
+  .cal-btn:disabled{opacity:.35;cursor:not-allowed}
+  .cal-months{font-family:var(--f-display);font-size:1.3rem;color:var(--ink)}
+
+  .cal-grids{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+  @media(max-width:720px){.cal-grids{grid-template-columns:1fr}}
+
+  .month-label{font-family:var(--f-display);font-size:1.05rem;text-align:center;margin-bottom:.75rem;color:var(--dock)}
+  .dow{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:4px}
+  .dow span{text-align:center;font-family:var(--f-mono);font-size:.62rem;color:var(--mist);text-transform:uppercase;letter-spacing:.04em;padding:.25rem 0}
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+  .day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:.82rem;border-radius:6px;cursor:pointer;position:relative;transition:background .12s,color .12s;user-select:none}
+  .day.empty{cursor:default}
+  .day.available{background:var(--paper);color:var(--ink);border:1px solid var(--rule)}
+  .day.available:hover{background:var(--signal-lt);border-color:var(--signal)}
+  .day.past{color:var(--mist);background:transparent;cursor:not-allowed;text-decoration:line-through;opacity:.5}
+  .day.busy{background:var(--busy);color:var(--busy-ink);cursor:not-allowed}
+  .day.busy::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(45deg,transparent,transparent 4px,rgba(162,59,59,.15) 4px,rgba(162,59,59,.15) 5px);border-radius:6px}
+  .day.sel{background:var(--dock);color:#fff;border-color:var(--dock)}
+  .day.in-range{background:#dbe4f0;color:var(--dock);border-radius:0}
+  .day.range-start{border-top-left-radius:6px;border-bottom-left-radius:6px}
+  .day.range-end{border-top-right-radius:6px;border-bottom-right-radius:6px}
+
+  .legend{display:flex;flex-wrap:wrap;gap:1.25rem;margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--rule)}
+  .leg{display:flex;align-items:center;gap:.5rem;font-size:.8rem;color:var(--ink-mid)}
+  .swatch{width:16px;height:16px;border-radius:4px;flex-shrink:0}
+  .sw-avail{background:var(--paper);border:1px solid var(--rule)}
+  .sw-busy{background:var(--busy)}
+  .sw-sel{background:var(--dock)}
+
+  .selbar{margin-top:1.5rem;background:var(--dock-dark);border-radius:12px;padding:1.25rem 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;opacity:0;transform:translateY(6px);transition:all .25s;pointer-events:none}
+  .selbar.show{opacity:1;transform:none;pointer-events:auto}
+  .selbar .dates{color:#fff}
+  .selbar .dates .big{font-family:var(--f-display);font-size:1.2rem}
+  .selbar .dates .sub{font-size:.8rem;color:rgba(255,255,255,.6);font-family:var(--f-mono)}
+  .btn-req{background:var(--signal);color:var(--dock-dark);border:none;font-weight:700;font-size:.92rem;padding:.85rem 1.6rem;border-radius:var(--radius);cursor:pointer;white-space:nowrap;transition:transform .15s,opacity .2s}
+  .btn-req:hover{transform:translateY(-1px);opacity:.92}
+  .btn-clear{background:transparent;border:1px solid rgba(255,255,255,.25);color:rgba(255,255,255,.8);font-size:.85rem;padding:.85rem 1.1rem;border-radius:var(--radius);cursor:pointer}
+  .btn-clear:hover{border-color:rgba(255,255,255,.6);color:#fff}
+
+  .status{margin-top:1rem;font-size:.8rem;color:var(--mist);font-family:var(--f-mono);display:flex;align-items:center;gap:.5rem}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--mist)}
+  .dot.live{background:var(--ok)}
+  .dot.demo{background:var(--signal)}
+
+  .note{margin-top:1.5rem;background:var(--signal-lt);border-left:3px solid var(--signal);border-radius:8px;padding:1rem 1.1rem;font-size:.83rem;color:#7a5300;line-height:1.55}
+  .minstay{margin-top:1rem;font-size:.82rem;color:var(--ink-mid)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="nav-brand">Plymouth Contractor Stay · Availability</div>
+  <a class="nav-back" href="index.html">← Back to property</a>
+</nav>
+
+<div class="wrap">
+  <div class="head">
+    <p class="eyebrow">Live availability</p>
+    <h1>Check dates &amp; request your stay</h1>
+    <p>Green dates are open; shaded dates are already booked. Tap your arrival then your departure, and we'll carry the dates straight into your booking request.</p>
+  </div>
+
+  <div class="cal-card">
+    <div class="cal-top">
+      <div class="cal-months" id="cal-title">—</div>
+      <div class="cal-nav">
+        <button class="cal-btn" id="prev" aria-label="Previous months">‹</button>
+        <button class="cal-btn" id="next" aria-label="Next months">›</button>
+      </div>
+    </div>
+
+    <div class="cal-grids">
+      <div>
+        <div class="month-label" id="m1-label"></div>
+        <div class="dow"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
+        <div class="grid" id="m1-grid"></div>
+      </div>
+      <div>
+        <div class="month-label" id="m2-label"></div>
+        <div class="dow"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
+        <div class="grid" id="m2-grid"></div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="leg"><span class="swatch sw-avail"></span> Available</div>
+      <div class="leg"><span class="swatch sw-busy"></span> Booked</div>
+      <div class="leg"><span class="swatch sw-sel"></span> Your selection</div>
+    </div>
+
+    <div class="minstay">Minimum stay: <strong>1 month</strong>. Final availability &amp; pricing confirmed on request.</div>
+
+    <div class="status"><span class="dot" id="status-dot"></span><span id="status-text">Loading availability…</span></div>
+  </div>
+
+  <div class="selbar" id="selbar">
+    <div class="dates">
+      <div class="big" id="sel-dates">—</div>
+      <div class="sub" id="sel-nights"></div>
+    </div>
+    <div style="display:flex;gap:.6rem">
+      <button class="btn-clear" onclick="clearSel()">Clear</button>
+      <button class="btn-req" onclick="requestDates()">Request these dates →</button>
+    </div>
+  </div>
+
+  <div class="note">
+    <strong>We keep availability up to date.</strong> Selecting dates here sends a request — it doesn't complete a booking or take payment. We confirm your dates and pricing before anything is finalised.
+  </div>
+</div>
+
+<script>
+  // ---- config ----
+  const MIN_NIGHTS = 28;              // ~1 month minimum
+  const HORIZON_MONTHS = 12;          // how far ahead people can browse
+
+  // ══════════════════════════════════════════════════════════════════
+  //  BOOKED / UNAVAILABLE DATES  —  edit this list yourself
+  // ──────────────────────────────────────────────────────────────────
+  //  Add one line per booked or blocked period.
+  //  'start' = first night taken.  'end' = the CHECKOUT day (the day it's
+  //  free again — that day itself stays selectable as someone's arrival).
+  //  Dates are YYYY-MM-DD. Delete a line when a period frees up.
+  //
+  //  Example:
+  //    { start: '2026-09-01', end: '2026-10-01' },   // September booked
+  //    { start: '2026-12-20', end: '2027-01-05' },   // held over Christmas
+  //
+  //  Leave the list empty ( [] ) to show every date as available.
+  // ══════════════════════════════════════════════════════════════════
+  let BOOKED = [
+    // { start: '2026-09-01', end: '2026-10-01' },
+  ];
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  let view = new Date(today.getFullYear(), today.getMonth(), 1);
+  let selStart = null, selEnd = null;
+
+  const iso = d => d.toISOString().split('T')[0];
+  const parse = s => { const [y,m,dd]=s.split('-').map(Number); return new Date(y,m-1,dd); };
+  const addDays=(d,n)=>{const x=new Date(d);x.setDate(x.getDate()+n);return x;};
+  const fmt = d => d.toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+
+  // Build a Set of booked day-strings for quick lookup
+  let bookedSet = new Set();
+  function rebuildBookedSet(){
+    bookedSet = new Set();
+    for(const r of BOOKED){
+      let d = parse(r.start), end = parse(r.end); // end exclusive (checkout day is free)
+      while(d < end){ bookedSet.add(iso(d)); d = addDays(d,1); }
+    }
+  }
+  const isBooked = d => bookedSet.has(iso(d));
+  const isPast = d => d < today;
+
+  // range contains a booked night? (block selections that span a booking)
+  function rangeHasBooked(a,b){
+    let d=new Date(a);
+    while(d < b){ if(isBooked(d)) return true; d=addDays(d,1); }
+    return false;
+  }
+
+  function renderMonth(base, gridId, labelId){
+    const grid=document.getElementById(gridId);
+    const label=document.getElementById(labelId);
+    grid.innerHTML='';
+    label.textContent = base.toLocaleDateString('en-GB',{month:'long',year:'numeric'});
+    const y=base.getFullYear(), m=base.getMonth();
+    const first=new Date(y,m,1);
+    let startDow=(first.getDay()+6)%7; // Mon=0
+    const daysIn=new Date(y,m+1,0).getDate();
+    for(let i=0;i<startDow;i++){ const e=document.createElement('div'); e.className='day empty'; grid.appendChild(e); }
+    for(let dnum=1;dnum<=daysIn;dnum++){
+      const d=new Date(y,m,dnum);
+      const el=document.createElement('div');
+      el.className='day';
+      el.textContent=dnum;
+      if(isPast(d)){ el.classList.add('past'); }
+      else if(isBooked(d)){ el.classList.add('busy'); el.title='Booked'; }
+      else{
+        el.classList.add('available');
+        el.addEventListener('click',()=>pick(d));
+        // selection styling
+        if(selStart && iso(d)===iso(selStart)){ el.classList.add('sel','range-start'); }
+        if(selEnd && iso(d)===iso(selEnd)){ el.classList.add('sel','range-end'); }
+        if(selStart && selEnd && d>selStart && d<selEnd){ el.classList.add('in-range'); }
+      }
+      grid.appendChild(el);
+    }
+  }
+
+  function render(){
+    const m2=new Date(view.getFullYear(),view.getMonth()+1,1);
+    document.getElementById('cal-title').textContent =
+      view.toLocaleDateString('en-GB',{month:'short'}) + ' – ' + m2.toLocaleDateString('en-GB',{month:'short',year:'numeric'});
+    renderMonth(view,'m1-grid','m1-label');
+    renderMonth(m2,'m2-grid','m2-label');
+    // nav limits
+    document.getElementById('prev').disabled = (view.getFullYear()===today.getFullYear() && view.getMonth()===today.getMonth());
+    const maxView=new Date(today.getFullYear(),today.getMonth()+HORIZON_MONTHS,1);
+    document.getElementById('next').disabled = (m2>=maxView);
+  }
+
+  function pick(d){
+    if(!selStart || (selStart && selEnd)){ selStart=d; selEnd=null; }
+    else if(d<=selStart){ selStart=d; selEnd=null; }
+    else {
+      if(rangeHasBooked(selStart,d)){ // can't span a booking
+        alert('Those dates cross an already-booked period. Please pick a clear range.');
+        selStart=d; selEnd=null;
+      } else { selEnd=d; }
+    }
+    updateBar(); render();
+  }
+
+  function nightsBetween(a,b){ return Math.round((b-a)/86400000); }
+
+  function updateBar(){
+    const bar=document.getElementById('selbar');
+    if(selStart && selEnd){
+      const n=nightsBetween(selStart,selEnd);
+      document.getElementById('sel-dates').textContent = fmt(selStart)+'  →  '+fmt(selEnd);
+      let sub = n+' night'+(n>1?'s':'');
+      if(n<MIN_NIGHTS) sub += '  ·  below 1-month minimum — request anyway & we\u2019ll advise';
+      document.getElementById('sel-nights').textContent = sub;
+      bar.classList.add('show');
+    } else if(selStart){
+      document.getElementById('sel-dates').textContent = fmt(selStart)+'  →  pick departure';
+      document.getElementById('sel-nights').textContent = '';
+      bar.classList.add('show');
+    } else {
+      bar.classList.remove('show');
+    }
+  }
+
+  function clearSel(){ selStart=selEnd=null; updateBar(); render(); }
+
+  function requestDates(){
+    if(!selStart){ return; }
+    const params=new URLSearchParams();
+    params.set('checkin', iso(selStart));
+    if(selEnd) params.set('checkout', iso(selEnd));
+    window.location.href='book.html?'+params.toString();
+  }
+
+  document.getElementById('prev').onclick=()=>{ view=new Date(view.getFullYear(),view.getMonth()-1,1); render(); };
+  document.getElementById('next').onclick=()=>{ view=new Date(view.getFullYear(),view.getMonth()+1,1); render(); };
+
+  // ---- render from the manual BOOKED list above ----
+  function init(){
+    rebuildBookedSet();
+    render();
+    const dot=document.getElementById('status-dot');
+    const txt=document.getElementById('status-text');
+    dot.className='dot live';
+    txt.textContent='We confirm your dates before anything is finalised';
+  }
+
+  init();
+</script>
+</body>
+</html>
