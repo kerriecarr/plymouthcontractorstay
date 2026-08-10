@@ -261,6 +261,36 @@
 
     .strip-item svg { flex-shrink: 0; }
 
+    /* ── VALUE CALLOUT ──────────────────────────────────── */
+    .value-callout {
+      background: var(--dock);
+      color: #fff;
+      padding: 3rem 5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+    .value-inner {
+      max-width: 720px;
+    }
+    .value-callout h3 {
+      font-family: var(--font-display);
+      font-size: clamp(1.5rem, 3vw, 2.1rem);
+      color: var(--signal);
+      margin-bottom: 0.9rem;
+      font-weight: 400;
+    }
+    .value-callout p {
+      font-size: 1.05rem;
+      line-height: 1.7;
+      color: rgba(255,255,255,0.85);
+    }
+    .value-callout .rate {
+      color: #fff;
+      font-weight: 600;
+    }
+
     /* ── SECTION BASE ───────────────────────────────────── */
     section { padding: 5rem 5rem; }
 
@@ -833,6 +863,8 @@
 
       .why-grid { grid-template-columns: 1fr; gap: 1px; }
 
+      .value-callout { padding: 2.5rem 1.5rem; }
+
       .property-intro {
         grid-template-columns: 1fr;
         gap: 2rem;
@@ -987,6 +1019,14 @@
     </div>
   </div>
 </section>
+
+<!-- VALUE CALLOUT -->
+<div class="value-callout">
+  <div class="value-inner">
+    <h3>Book direct, pay less</h3>
+    <p>Our usual monthly rate is <span class="rate">£1,850, all-inclusive</span> — with no platform service fees added on top. Booking direct typically saves <span class="rate">15–20%</span> versus the same stay on a listing site, and you deal with us the whole way through.</p>
+  </div>
+</div>
 
 <!-- PROPERTY SECTION -->
 <section id="property" style="padding: 5rem;">
