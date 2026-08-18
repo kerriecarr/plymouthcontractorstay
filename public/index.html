@@ -238,6 +238,8 @@
       grid-column: 1 / -1;
     }
 
+    .hero-img-extra { display: none; }
+
     /* ── SIGNAL STRIP ───────────────────────────────────── */
     .signal-strip {
       background: var(--signal);
@@ -850,14 +852,18 @@
 
       .hero-images {
         order: 1;
-        height: 280px;
+        height: auto;
         max-height: none;
-        grid-template-rows: 1fr;
-        grid-template-columns: 1fr;
+        grid-template-rows: 160px 160px;
+        grid-template-columns: 1fr 1fr;
+        gap: 5px;
+        padding: 0 1.5rem 1rem;
       }
 
-      .hero-images img:not(:first-child) { display: none; }
+      .hero-images img { border-radius: 8px; }
+      .hero-images img:not(:first-child) { display: block; }
       .hero-img-main { grid-column: auto; }
+      .hero-img-extra { display: block; }
 
       .signal-strip { padding: 1rem 1.5rem; gap: 1.5rem; }
 
@@ -954,6 +960,8 @@
          alt="Kitchen" />
     <img src="images/bedroom.JPG"
          alt="Bedroom" />
+    <img class="hero-img-extra" src="images/bathroom.JPG"
+         alt="Bathroom" />
   </div>
 </section>
 
