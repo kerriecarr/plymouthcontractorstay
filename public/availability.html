@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Availability · Plymouth Contractor Stay</title>
+<title>Availability · Plymouth Contractor Stays</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
 <style>
@@ -83,7 +83,7 @@
 </head>
 <body>
 <nav>
-  <div class="nav-brand">Plymouth Contractor Stay · Availability</div>
+  <div class="nav-brand">Plymouth Contractor Stays · Availability</div>
   <a class="nav-back" href="index.html">← Back to property</a>
 </nav>
 
@@ -163,8 +163,9 @@
   //  Leave the list empty ( [] ) to show every date as available.
   // ══════════════════════════════════════════════════════════════════
   let BOOKED = [
-  { start: '2026-08-01', end: '2026-08-30' },
-];
+    // { start: '2026-09-01', end: '2026-10-01' },
+  ];
+
   const today = new Date(); today.setHours(0,0,0,0);
   let view = new Date(today.getFullYear(), today.getMonth(), 1);
   let selStart = null, selEnd = null;
